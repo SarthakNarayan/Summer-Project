@@ -1,0 +1,55 @@
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+savedImage = cv2.imread('E:\RMI project\AdvanceTask-1\images\savedimage3.jpg',0)
+savedImage2 = cv2.imread('E:\RMI project\AdvanceTask-1\images\savedimage3.jpg',1)
+
+#creating 2 black screen for drawing circle and rectangle
+img1 = np.zeros((480,640,3),np.uint8)
+img2 = np.zeros((480,640,3),np.uint8)
+
+
+#drawing circle and rectangle and converting them to grayscale for thresholding
+circle = cv2.circle(img2 , (320,320) , 56 ,(255,0,0),5)
+circle1 = cv2.cvtColor(circle , cv2.COLOR_BGR2GRAY)
+
+rectangle = cv2.rectangle(img1 , (150,150) , (250,250) , (255,0,0),3)
+rectangle1 = cv2.cvtColor(rectangle , cv2.COLOR_BGR2GRAY)
+
+#thresholding and finding contours for image,circle and rectangle
+
+ret , threshold1 = cv2.threshold(savedImage , 125 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+_,contours1,_ = cv2.findContours(threshold1,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#print("the number of contours in figure are ",len(contours1))
+cnt1 = contours1[0]
+
+ret , threshold2 = cv2.threshold(rectangle1 , 125 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+_,contours2,_ = cv2.findContours(threshold2,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#print("the number of contours in square are ",len(contours2))
+cnt2 = contours2[0]
+
+ret , threshold3 = cv2.threshold(circle1 , 125 , 255 , cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+_,contours3,_ = cv2.findContours(threshold3,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#print("the number of contours in circle are ",len(contours3))
+cnt3 = contours3[0]
+
+
+#checking for match
+match1 = cv2.matchShapes(cnt1 , cnt2 , 3 ,0.0)
+print ("for square " ,match1)
+
+match2 = cv2.matchShapes(cnt1 , cnt3 , 3 ,0.0)
+print ("for circle " ,match2)
+
+
+#lower the match better the result
+if match2 > match1:
+    print("it is a rectangle")
+else :
+    print("it is a circle")
+
+
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
